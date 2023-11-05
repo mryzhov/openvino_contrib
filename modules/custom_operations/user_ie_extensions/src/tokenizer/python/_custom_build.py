@@ -43,7 +43,7 @@ class build_py(_build_py):
         self.announce(f"Create build directory: {self.build_temp}", level=3)
 
         source_dir = '/home/rmikhail/src/openvino_contrib/modules/custom_operations/user_ie_extensions'
-        binary_dir = 'bin'
+        binary_dir = '/home/rmikhail/src/openvino_contrib/modules/custom_operations/user_ie_extensions/tokenizer/python/ov_tokenizer/build'
 
         # even perform a build in case of binary directory does not exist
         binary_dir = binary_dir if os.path.isabs(binary_dir) else os.path.join(self.build_temp, binary_dir)
@@ -52,7 +52,7 @@ class build_py(_build_py):
             self.announce(f"Configuring cmake project", level=3)
             self.spawn(["cmake", f"-DOpenVINO_DIR={OPENVINO_BUILD_DIR}",
                                     f"-DCMAKE_BUILD_TYPE={CONFIG}",
-                                    '-DCUSTOM_OPERATIONS=tokenizers',
+                                    '-DCUSTOM_OPERATIONS=tokenizer',
                                     self.cmake_args,
                                     "-S", source_dir,
                                     "-B", binary_dir])
