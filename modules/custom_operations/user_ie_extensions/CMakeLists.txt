@@ -19,6 +19,8 @@ endif()
 
 include(cmake/platforms.cmake)
 
+include(GNUInstallDirs)
+
 find_package(OpenVINO REQUIRED COMPONENTS Runtime)
 find_package(TBB COMPONENTS tbb tbbmalloc)
 find_package(OpenCV COMPONENTS core)
@@ -101,17 +103,20 @@ endif()
 # Left sentence_piece for backward compatibility
 if("tokenizer" IN_LIST CUSTOM_OPERATIONS)
   add_subdirectory(${SOURCES}/tokenizer)
+  install(FILES ${FAST_TOKENIZER_LIBS} DESTINATION .)
 endif()
-
+# set_target_properties(${TARGET_NAME} PROPERTIES INTERFACE_LINK_OPTIONS "-Wl,--allow-shlib-undefined")
 target_link_libraries(${TARGET_NAME} PRIVATE openvino::runtime)
+target_include_directories(${TARGET_NAME} PRIVATE $<TARGET_PROPERTY:openvino::runtime,INTERFACE_INCLUDE_DIRECTORIES>)
 
 target_compile_definitions(${TARGET_NAME} PRIVATE ${CUSTOM_OPERATIONS})
 target_include_directories(${TARGET_NAME} PUBLIC ./include/)
+if(DEFINED SKBUILD)
   if(APPLE)
     set_target_properties(
       ${TARGET_NAME} PROPERTIES INSTALL_RPATH "@loader_path/${CMAKE_INSTALL_LIBDIR}")
   else()
     set_target_properties(${TARGET_NAME} PROPERTIES INSTALL_RPATH
-                                            "$ORIGIN/${CMAKE_INSTALL_LIBDIR}")
+                                            "$ORIGIN")
   endif()
 endif()

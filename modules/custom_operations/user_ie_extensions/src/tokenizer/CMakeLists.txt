@@ -9,7 +9,8 @@ endif()
 option(BUILD_FAST_TOKENIZERS OFF)
 
 # to build only sentencepiece-static target
-set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY EXCLUDE_FROM_ALL ON)
+# set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+#              PROPERTY EXCLUDE_FROM_ALL ON)
 
 #
 # Compile flags
@@ -134,6 +135,9 @@ target_include_directories(${TARGET_NAME} PRIVATE
   # fast_tokenizer
   ${FAST_TOKENIZER_INCS})
 
+set_property(DIRECTORY ${sentencepiece_SOURCE_DIR}
+             PROPERTY EXCLUDE_FROM_ALL ON)
+
 if(CMAKE_CL_64)
     target_compile_definitions(sentencepiece-static PRIVATE _CRT_SECURE_NO_WARNINGS _SCL_SECURE_NO_WARNINGS)
 endif()
@@ -144,3 +148,5 @@ target_link_libraries(${TARGET_NAME} PRIVATE ${FAST_TOKENIZER_LIBS} sentencepiec
 string(REPLACE " " ";" cxx_flags "${cxx_flags}")
 set_target_properties(${TARGET_NAME} PROPERTIES CXX_STANDARD 17
                                                 COMPILE_OPTIONS "${cxx_flags}")
+
+install(FILES ${FAST_TOKENIZER_LIBS} DESTINATION .)

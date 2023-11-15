@@ -4,8 +4,9 @@ from skbuild import constants
 setup(
     packages=["ov_tokenizer"],
     package_dir={"": "src/tokenizer/python"},
-    cmake_install_dir="src/lib",
-    cmake_args=['-DCUSTOM_OPERATIONS:STRING=tokenizer']
+    cmake_install_dir="src/tokenizer/python/ov_tokenizer/libs",
+    cmake_args=['-DCUSTOM_OPERATIONS:STRING=tokenizer'],
+    root_is_pure=True
 )
 
 # When building extension modules `cmake_install_dir` should always be set to the
