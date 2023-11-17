@@ -105,9 +105,9 @@ if("tokenizer" IN_LIST CUSTOM_OPERATIONS)
   add_subdirectory(${SOURCES}/tokenizer)
   install(FILES ${FAST_TOKENIZER_LIBS} DESTINATION .)
 endif()
-# set_target_properties(${TARGET_NAME} PROPERTIES INTERFACE_LINK_OPTIONS "-Wl,--allow-shlib-undefined")
+
 target_link_libraries(${TARGET_NAME} PRIVATE openvino::runtime)
-target_include_directories(${TARGET_NAME} PRIVATE $<TARGET_PROPERTY:openvino::runtime,INTERFACE_INCLUDE_DIRECTORIES>)
+#target_include_directories(${TARGET_NAME} PRIVATE $<TARGET_PROPERTY:openvino::runtime,INTERFACE_INCLUDE_DIRECTORIES>)
 
 target_compile_definitions(${TARGET_NAME} PRIVATE ${CUSTOM_OPERATIONS})
 target_include_directories(${TARGET_NAME} PUBLIC ./include/)
