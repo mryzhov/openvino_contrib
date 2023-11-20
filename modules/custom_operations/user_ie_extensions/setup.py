@@ -5,8 +5,8 @@ setup(
     packages=["ov_tokenizer"],
     package_dir={"": "src/tokenizer/python"},
     cmake_install_dir="src/tokenizer/python/ov_tokenizer/libs",
-    cmake_args=['-DCUSTOM_OPERATIONS:STRING=tokenizer'],
-    root_is_pure=True
+    cmake_args=['-DCUSTOM_OPERATIONS:STRING=tokenizer',
+                '-DBUILD_FAST_TOKENIZERS=OFF']
 )
 
 # When building extension modules `cmake_install_dir` should always be set to the

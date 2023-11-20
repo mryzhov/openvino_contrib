@@ -19,8 +19,6 @@ endif()
 
 include(cmake/platforms.cmake)
 
-include(GNUInstallDirs)
-
 find_package(OpenVINO REQUIRED COMPONENTS Runtime)
 find_package(TBB COMPONENTS tbb tbbmalloc)
 find_package(OpenCV COMPONENTS core)
@@ -111,12 +109,15 @@ target_link_libraries(${TARGET_NAME} PRIVATE openvino::runtime)
 
 target_compile_definitions(${TARGET_NAME} PRIVATE ${CUSTOM_OPERATIONS})
 target_include_directories(${TARGET_NAME} PUBLIC ./include/)
+
 if(DEFINED SKBUILD)
+  # Installing the extension module to the root of the package
+  install(TARGETS ${TARGET_NAME} LIBRARY DESTINATION . )
+
   if(APPLE)
     set_target_properties(
-      ${TARGET_NAME} PROPERTIES INSTALL_RPATH "@loader_path/${CMAKE_INSTALL_LIBDIR}")
+      ${TARGET_NAME} PROPERTIES INSTALL_RPATH "@loader_path")
   else()
-    set_target_properties(${TARGET_NAME} PROPERTIES INSTALL_RPATH
-                                            "$ORIGIN")
+    set_target_properties(${TARGET_NAME} PROPERTIES INSTALL_RPATH "$ORIGIN")
   endif()
 endif()
