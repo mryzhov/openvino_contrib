@@ -15,7 +15,8 @@ _ext_libs_path = os.path.join(os.path.dirname(__file__), "libs")
 _ext_path = os.path.join(_ext_libs_path, "libuser_ov_extensions.so")
 
 if sys.platform == "win32":
-    _ext_path = os.path.join(_ext_libs_path, "libuser_ov_extensions.dll")
+    _ext_libs_path = os.path.join(_ext_libs_path, "bin")
+    _ext_path = os.path.join(_ext_libs_path, "user_ov_extensions.dll")
     if os.path.isdir(_ext_libs_path):
         # On Windows, with Python >= 3.8, DLLs are no longer imported from the PATH.
         os.add_dll_directory(os.path.abspath(_ext_path))

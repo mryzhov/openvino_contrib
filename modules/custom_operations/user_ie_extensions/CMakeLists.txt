@@ -28,6 +28,10 @@ set(OP_REQ_TBB "complex_mul" "fft")
 set(SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
+
 #
 # Select specific operations
 #
@@ -101,7 +105,6 @@ endif()
 # Left sentence_piece for backward compatibility
 if("tokenizer" IN_LIST CUSTOM_OPERATIONS)
   add_subdirectory(${SOURCES}/tokenizer)
-  install(FILES ${FAST_TOKENIZER_LIBS} DESTINATION .)
 endif()
 
 target_link_libraries(${TARGET_NAME} PRIVATE openvino::runtime)

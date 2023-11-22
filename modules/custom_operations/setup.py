@@ -3,8 +3,8 @@ from skbuild import constants
 
 setup(
     packages=["ov_tokenizer"],
-    package_dir={"": "src/tokenizer/python"},
-    cmake_install_dir="src/tokenizer/python/ov_tokenizer/libs",
+    package_dir={"": "user_ie_extensions/src/tokenizer/python"},
+    cmake_install_dir="user_ie_extensions/src/tokenizer/python/ov_tokenizer/libs",
     cmake_args=['-DCUSTOM_OPERATIONS:STRING=tokenizer',
                 '-DBUILD_FAST_TOKENIZERS=OFF']
 )
