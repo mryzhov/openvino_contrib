@@ -112,7 +112,6 @@ else()
   if(WIN32 AND X86_64)
       # we use re2 library in regex_normalization operation, so have to add to this list
       # because prebuilt fast_tokenizers package does not provide this library
-      # list(APPEND FAST_TOKENIZER_LIBS re2)
       set (RE2_LIBS re2)
   endif()
 endif()
@@ -148,8 +147,9 @@ target_link_libraries(${TARGET_NAME} PRIVATE ${FAST_TOKENIZER_LIBS} ${RE2_LIBS} 
 string(REPLACE " " ";" cxx_flags "${cxx_flags}")
 set_target_properties(${TARGET_NAME} PROPERTIES CXX_STANDARD 17
                                                 COMPILE_OPTIONS "${cxx_flags}")
-
-file(GLOB DEPS_LIBS ${fast_tokenizer_SOURCE_DIR}/lib/*.dll ${fast_tokenizer_SOURCE_DIR}/third_party/lib/*.dll)
-file(COPY ${DEPS_LIBS} DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_BUILD_TYPE})
+if(WIN32)
+  file(GLOB DEPS_LIBS ${fast_tokenizer_SOURCE_DIR}/lib/*.dll ${fast_tokenizer_SOURCE_DIR}/third_party/lib/*.dll)
+  file(COPY ${DEPS_LIBS} DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_BUILD_TYPE})
+endif()
 
 install(FILES ${DEPS_LIBS} DESTINATION .)

@@ -7,6 +7,7 @@ if(POLICY CMP0079)
   cmake_policy(SET CMP0079 NEW)
 endif()
 
+
 if(POLICY CMP0057)
   cmake_policy(SET CMP0057 NEW)
 endif()
@@ -27,10 +28,6 @@ set(OP_REQ_TBB "complex_mul" "fft")
 
 set(SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include")
-
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 
 #
 # Select specific operations
@@ -93,6 +90,12 @@ endforeach()
 #
 
 add_library(${TARGET_NAME} SHARED ${SRC})
+
+set_target_properties(${TARGET_NAME} PROPERTIES
+  RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin # .exe and .dll
+  ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib # .lib and .a
+  LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib # .so and .dylib
+)
 
 if(OpenCV_FOUND)
   target_link_libraries(${TARGET_NAME} PRIVATE ${OpenCV_LIBRARIES})
