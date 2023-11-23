@@ -1,5 +1,5 @@
 import os
-import openvino
+# import openvino
 import ov_tokenizer
 
 from transformers import AutoTokenizer, AutoModelForSequenceClassification

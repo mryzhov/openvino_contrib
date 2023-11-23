@@ -2,11 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 cmake_policy(SET CMP0057 NEW)
-
-if(POLICY CMP0079)
-  cmake_policy(SET CMP0079 NEW)
-endif()
-
+cmake_policy(SET CMP0079 NEW)
 
 if(POLICY CMP0057)
   cmake_policy(SET CMP0057 NEW)
@@ -92,9 +88,9 @@ endforeach()
 add_library(${TARGET_NAME} SHARED ${SRC})
 
 set_target_properties(${TARGET_NAME} PROPERTIES
-  RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin # .exe and .dll
-  ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib # .lib and .a
-  LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib # .so and .dylib
+  RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} # .exe and .dll
+  ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/lib # .lib and .a
+  LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} # .so and .dylib
 )
 
 if(OpenCV_FOUND)
@@ -108,18 +104,21 @@ endif()
 # Left sentence_piece for backward compatibility
 if("tokenizer" IN_LIST CUSTOM_OPERATIONS)
   add_subdirectory(${SOURCES}/tokenizer)
+  if(extra_dlls)
+    add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
+      COMMAND ${CMAKE_COMMAND} -E copy ${extra_dlls} $<TARGET_FILE_DIR:${TARGET_NAME}>)
+    install(FILES ${extra_dlls} DESTINATION .)
+  endif()
 endif()
 
 target_link_libraries(${TARGET_NAME} PRIVATE openvino::runtime)
-#target_include_directories(${TARGET_NAME} PRIVATE $<TARGET_PROPERTY:openvino::runtime,INTERFACE_INCLUDE_DIRECTORIES>)
 
 target_compile_definitions(${TARGET_NAME} PRIVATE ${CUSTOM_OPERATIONS})
 target_include_directories(${TARGET_NAME} PUBLIC ./include/)
 
 if(DEFINED SKBUILD)
   # Installing the extension module to the root of the package
-  install(TARGETS ${TARGET_NAME} LIBRARY DESTINATION . )
-
+  install(TARGETS ${TARGET_NAME} RUNTIME DESTINATION .)
   if(APPLE)
     set_target_properties(
       ${TARGET_NAME} PROPERTIES INSTALL_RPATH "@loader_path")

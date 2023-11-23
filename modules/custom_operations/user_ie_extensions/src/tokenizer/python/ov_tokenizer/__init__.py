@@ -11,19 +11,22 @@ from .node_factory import init_extension
 from .str_pack import pack_strings, unpack_strings
 from .utils import add_greedy_decoding, connect_models
 
+_ext_name = "user_ov_extensions"
 _ext_libs_path = os.path.join(os.path.dirname(__file__), "libs")
-_ext_path = os.path.join(_ext_libs_path, "libuser_ov_extensions.so")
 
 if sys.platform == "win32":
-    _ext_libs_path = os.path.join(_ext_libs_path, "bin")
-    _ext_path = os.path.join(_ext_libs_path, "user_ov_extensions.dll")
+    _ext_path = os.path.join(_ext_libs_path, f'{_ext_name}.dll')
     if os.path.isdir(_ext_libs_path):
         # On Windows, with Python >= 3.8, DLLs are no longer imported from the PATH.
         os.add_dll_directory(os.path.abspath(_ext_path))
     else:
         sys.exit(f'Error: extention libriary path {_ext_libs_path} not found')
 elif sys.platform == "darwin":
-    _ext_path = os.path.join(_ext_libs_path, "libuser_ov_extensions.dylib")
+    _ext_path = os.path.join(_ext_libs_path, f'lib{_ext_name}.dylib')
+elif sys.platform == "linux":
+    _ext_path = os.path.join(_ext_libs_path, f'lib{_ext_name}.so')
+else:
+    sys.exit(f'Error: extention does not support platform {sys.platform}')
 
 old_core_init = openvino.runtime.Core.__init__
 def new_core_init(self, *k, **kw):

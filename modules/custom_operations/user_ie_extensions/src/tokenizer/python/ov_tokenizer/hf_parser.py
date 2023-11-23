@@ -25,7 +25,7 @@ from .constants import (
     TOKENIZER_DECODER_NAME,
     TOKENIZER_ENCODER_NAME,
 )
-from .node_factory import factory
+from . import _factory
 from .tokenizer_pipeline import (
     BPETokenizationStep,
     BytesToCharsStep,
@@ -116,7 +116,7 @@ class TransformersTokenizerPipelineParser:
         self.original_tokenizer = tokenizer_object
         with TemporaryDirectory() as tmpdir:
             tokenizer_object.save_pretrained(tmpdir)
-            with open(Path(tmpdir) / "tokenizer.json") as tj:
+            with open(Path(tmpdir) / "tokenizer.json", encoding="utf8") as tj:
                 self.tokenizer_json = json.load(tj)
         self.pipeline = TokenizerPipeline()
         self.number_of_inputs = number_of_inputs
@@ -313,7 +313,7 @@ def is_sentencepiece_model(hf_tokenizer: "PreTrainedTokenizerBase") -> bool:
 def add_tokens_to_sentencepiece_model(sp_model_path: Path, hf_tokenizer: "PreTrainedTokenizerBase") -> None:
     model_pb = import_protobuf()
     model = model_pb.ModelProto()
-    with open(sp_model_path, "rb") as model_file:
+    with open(sp_model_path, "rb", encoding="utf8") as model_file:
         model.ParseFromString(model_file.read())
 
     add_token_dict = hf_tokenizer.tokenizer.index_special_tokens
@@ -322,7 +322,7 @@ def add_tokens_to_sentencepiece_model(sp_model_path: Path, hf_tokenizer: "PreTra
         new_piece.piece = token
         model.pieces.append(new_piece)
 
-    with open(sp_model_path, "wb") as model_file:
+    with open(sp_model_path, "wb", encoding="utf8") as model_file:
         model_file.write(model.SerializeToString())
 
 
@@ -365,7 +365,7 @@ def convert_sentencepiece_model_tokenizer(
         )
     add_bos_token = getattr(hf_tokenizer, "add_bos_token", add_eos_token) or False
 
-    tokenizer_node = factory.create(
+    tokenizer_node = _factory.create(
         "SentencepieceTokenizer",
         [sp_model_node, input_node],
         {
@@ -383,7 +383,7 @@ def convert_sentencepiece_model_tokenizer(
 
     default_value = make_constant_node(hf_tokenizer.pad_token_id or 0, values.element_type)
     broadcast = opset.broadcast(default_value, dense_shape)
-    scatternd_input_ids = factory.create(
+    scatternd_input_ids = _factory.create(
         "ScatterNDUpdate",
         [broadcast, indices, values],  # FIXME: pad left side instead of right
     )
@@ -399,7 +399,7 @@ def convert_sentencepiece_model_tokenizer(
     outputs = scatternd_input_ids.outputs()
 
     if add_attention_mask:
-        attention_mask = factory.create(
+        attention_mask = _factory.create(
             "ScatterNDUpdate",
             [
                 broadcast,
@@ -432,7 +432,7 @@ def convert_sentencepiece_model_tokenizer(
 def get_sp_decoder(sp_model_node: Node, streaming_decoder: bool = False) -> Model:
     token_ids = op.Parameter(Type.i32, PartialShape(["?", "?"]))  # (batch, sequence)
 
-    decoder = factory.create(
+    decoder = _factory.create(
         "SentencepieceStreamDetokenizer" if streaming_decoder else "SentencepieceDetokenizer",
         [sp_model_node, token_ids],
     ).outputs()
@@ -440,7 +440,7 @@ def get_sp_decoder(sp_model_node: Node, streaming_decoder: bool = False) -> Mode
     if streaming_decoder:
         decoder = RegexDecodingStep.replace_sp_spaces().get_ov_subgraph(decoder)
 
-    string_output = factory.create("StringTensorPack", decoder).outputs()
+    string_output = _factory.create("StringTensorPack", decoder).outputs()
     string_output[0].tensor.add_names({STRING_OUTPUT_NAME})
     tokenizer_decoder = Model(string_output, [token_ids], TOKENIZER_DECODER_NAME)
     tokenizer_decoder.validate_nodes_and_infer_types()

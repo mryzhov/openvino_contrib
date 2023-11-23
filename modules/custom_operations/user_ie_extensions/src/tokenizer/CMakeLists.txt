@@ -1,7 +1,6 @@
 # Copyright (C) 2018-2023 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 #
-
 if(POLICY CMP0135)
   cmake_policy(SET CMP0135 NEW)
 endif()
@@ -109,6 +108,8 @@ else()
   FetchContent_MakeAvailable(fast_tokenizer)
   include("${fast_tokenizer_SOURCE_DIR}/FastTokenizer.cmake")
 
+  set(fast_tokenizer_SOURCE_DIR "${fast_tokenizer_SOURCE_DIR}" PARENT_SCOPE)
+
   if(WIN32 AND X86_64)
       # we use re2 library in regex_normalization operation, so have to add to this list
       # because prebuilt fast_tokenizers package does not provide this library
@@ -147,9 +148,16 @@ target_link_libraries(${TARGET_NAME} PRIVATE ${FAST_TOKENIZER_LIBS} ${RE2_LIBS} 
 string(REPLACE " " ";" cxx_flags "${cxx_flags}")
 set_target_properties(${TARGET_NAME} PROPERTIES CXX_STANDARD 17
                                                 COMPILE_OPTIONS "${cxx_flags}")
-if(WIN32)
-  file(GLOB DEPS_LIBS ${fast_tokenizer_SOURCE_DIR}/lib/*.dll ${fast_tokenizer_SOURCE_DIR}/third_party/lib/*.dll)
-  file(COPY ${DEPS_LIBS} DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_BUILD_TYPE})
-endif()
+#
+# Post build steps to copy core_tokenizers dependencies
+#
 
-install(FILES ${DEPS_LIBS} DESTINATION .)
+if(WIN32 AND X86_64)
+  if(BUILD_FAST_TOKENIZERS)
+    # TODO
+  else()
+    set(extra_dlls "${fast_tokenizer_SOURCE_DIR}/lib/core_tokenizers.dll"
+                   "${fast_tokenizer_SOURCE_DIR}/third_party/lib/icudt70.dll"
+                   "${fast_tokenizer_SOURCE_DIR}/third_party/lib/icuuc70.dll" PARENT_SCOPE)
+  endif()
+endif()
