@@ -14,10 +14,8 @@ if(NOT CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD 11)
 endif()
 
-include(cmake/platforms.cmake)
-
 find_package(OpenVINO REQUIRED COMPONENTS Runtime)
-find_package(TBB COMPONENTS tbb tbbmalloc)
+find_package(TBB COMPONENTS tbb)
 find_package(OpenCV COMPONENTS core)
 
 set(OP_REQ_TBB "complex_mul" "fft")
@@ -98,24 +96,27 @@ if(OpenCV_FOUND)
 endif()
 
 if(TBB_FOUND)
-  target_link_libraries(${TARGET_NAME} PRIVATE TBB::tbb TBB::tbbmalloc)
+  target_link_libraries(${TARGET_NAME} PRIVATE TBB::tbb)
 endif()
 
 # Left sentence_piece for backward compatibility
 if("tokenizer" IN_LIST CUSTOM_OPERATIONS)
   add_subdirectory(${SOURCES}/tokenizer)
+
+  # post build steps
   if(extra_dlls)
-    add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
-      COMMAND ${CMAKE_COMMAND} -E copy ${extra_dlls} $<TARGET_FILE_DIR:${TARGET_NAME}>)
+      add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy ${extra_dlls} $<TARGET_FILE_DIR:${TARGET_NAME}>)
     install(FILES ${extra_dlls} DESTINATION .)
   endif()
 endif()
 
 target_link_libraries(${TARGET_NAME} PRIVATE openvino::runtime)
 
-target_compile_definitions(${TARGET_NAME} PRIVATE ${CUSTOM_OPERATIONS})
-target_include_directories(${TARGET_NAME} PUBLIC ./include/)
+target_compile_definitions(${TARGET_NAME} PRIVATE IMPLEMENT_OPENVINO_EXTENSION_API ${CUSTOM_OPERATIONS})
 
+# TODO: remove
+target_include_directories(${TARGET_NAME} PUBLIC ./include/)
 if(DEFINED SKBUILD)
   # Installing the extension module to the root of the package
   install(TARGETS ${TARGET_NAME} RUNTIME DESTINATION .)
