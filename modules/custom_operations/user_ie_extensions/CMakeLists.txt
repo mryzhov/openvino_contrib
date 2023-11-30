@@ -114,13 +114,18 @@ target_compile_definitions(${TARGET_NAME} PRIVATE IMPLEMENT_OPENVINO_EXTENSION_A
 
 # TODO: remove
 target_include_directories(${TARGET_NAME} PUBLIC ./include/)
+
 if(DEFINED SKBUILD)
   # Installing the extension module to the root of the package
-  install(TARGETS ${TARGET_NAME} RUNTIME DESTINATION .)
-  if(APPLE)
-    set_target_properties(
-      ${TARGET_NAME} PROPERTIES INSTALL_RPATH "@loader_path")
-  else()
+  if(LINUX)
     set_target_properties(${TARGET_NAME} PROPERTIES INSTALL_RPATH "$ORIGIN")
+    install(TARGETS ${TARGET_NAME} LIBRARY DESTINATION .)
+  elseif(APPLE)
+    set_target_properties(${TARGET_NAME} PROPERTIES INSTALL_RPATH "@loader_path")
+    install(TARGETS ${TARGET_NAME} LIBRARY DESTINATION .)
+  elseif(WIN32 AND X86_64)
+    install(TARGETS ${TARGET_NAME} RUNTIME DESTINATION .)
+  else()
+    message(FATAL "Unsupported platform")
   endif()
 endif()
