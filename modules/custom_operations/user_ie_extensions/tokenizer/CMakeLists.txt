@@ -8,9 +8,6 @@ endif()
 
 option(BUILD_FAST_TOKENIZERS OFF)
 
-# to build only direct dependencies
-set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY EXCLUDE_FROM_ALL ON)
-
 #
 # Compile flags
 #
@@ -128,7 +125,7 @@ else()
   if(WIN32 AND X86_64)
       # we use re2 library in regex_normalization operation, so have to add to this list
       # because prebuilt fast_tokenizers package does not provide this library
-      list(APPEND FAST_TOKENIZER_LIBS re2)
+      set (RE2_LIBS re2)
   endif()
 endif()
 
@@ -147,11 +144,17 @@ target_include_directories(${TARGET_NAME} PRIVATE
   # fast_tokenizer
   ${FAST_TOKENIZER_INCS})
 
+set_property(DIRECTORY ${sentencepiece_SOURCE_DIR}
+             PROPERTY EXCLUDE_FROM_ALL ON)
+
+set_property(DIRECTORY ${re2_SOURCE_DIR}
+             PROPERTY EXCLUDE_FROM_ALL ON)
+
 if(CMAKE_CL_64)
     target_compile_definitions(sentencepiece-static PRIVATE _CRT_SECURE_NO_WARNINGS _SCL_SECURE_NO_WARNINGS)
 endif()
 
-target_link_libraries(${TARGET_NAME} PRIVATE ${FAST_TOKENIZER_LIBS} sentencepiece-static)
+target_link_libraries(${TARGET_NAME} PRIVATE ${FAST_TOKENIZER_LIBS} ${RE2_LIBS} sentencepiece-static)
 
 # string_view is used from cxx17
 set_target_properties(${TARGET_NAME} PROPERTIES CXX_STANDARD 17)
