@@ -1,0 +1,13 @@
+openvino>=2023.1
+numpy
+
+[all]
+ov_tokenizer[dev,transformers]
+
+[dev]
+black
+ruff
+pytest
+
+[transformers]
+transformers[sentencepiece]

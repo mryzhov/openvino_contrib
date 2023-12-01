@@ -1,0 +1,20 @@
+Metadata-Version: 2.1
+Name: ov-tokenizer
+Version: 0.0.1
+Summary: Convert tokenizers into OpenVINO models
+Author-email: OpenVINO Developers <openvino@intel.com>
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Requires-Python: >=3.8
+Requires-Dist: openvino>=2023.1
+Requires-Dist: numpy
+Provides-Extra: dev
+Requires-Dist: black; extra == "dev"
+Requires-Dist: ruff; extra == "dev"
+Requires-Dist: pytest; extra == "dev"
+Provides-Extra: transformers
+Requires-Dist: transformers[sentencepiece]; extra == "transformers"
+Provides-Extra: all
+Requires-Dist: ov_tokenizer[dev,transformers]; extra == "all"
