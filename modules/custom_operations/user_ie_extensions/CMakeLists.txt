@@ -82,12 +82,6 @@ endforeach()
 
 add_library(${TARGET_NAME} SHARED ${SRC})
 
-set_target_properties(${TARGET_NAME} PROPERTIES
-  RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} # .exe and .dll
-  ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/lib # .lib and .a
-  LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} # .so and .dylib
-)
-
 if(OpenCV_FOUND)
   target_link_libraries(${TARGET_NAME} PRIVATE ${OpenCV_LIBRARIES})
 endif()
