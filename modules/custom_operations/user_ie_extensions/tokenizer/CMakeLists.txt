@@ -170,12 +170,12 @@ if(BUILD_FAST_TOKENIZERS)
   # TODO
 else()
   if(WIN32 AND X86_64)
-    set(extra_dlls "${fast_tokenizer_SOURCE_DIR}/lib/core_tokenizers.dll"
+    set(extra_libs "${fast_tokenizer_SOURCE_DIR}/lib/core_tokenizers.dll"
                   "${fast_tokenizer_SOURCE_DIR}/third_party/lib/icudt70.dll"
                   "${fast_tokenizer_SOURCE_DIR}/third_party/lib/icuuc70.dll" PARENT_SCOPE)
   elseif(LINUX)
-    set(extra_dlls "${fast_tokenizer_SOURCE_DIR}/lib/libcore_tokenizers.so" PARENT_SCOPE)
+    set(extra_libs "${fast_tokenizer_SOURCE_DIR}/lib/libcore_tokenizers.so" PARENT_SCOPE)
   elseif(APPLE)
-    set(extra_dlls "${fast_tokenizer_SOURCE_DIR}/lib/libcore_tokenizers.dylib" PARENT_SCOPE)
+    set(extra_libs "${fast_tokenizer_SOURCE_DIR}/lib/libcore_tokenizers.dylib" PARENT_SCOPE)
   endif()
 endif()

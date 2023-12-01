@@ -95,10 +95,9 @@ if("tokenizer" IN_LIST CUSTOM_OPERATIONS)
   add_subdirectory(tokenizer)
 
   # post build steps
-  if(extra_dlls)
-      add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy ${extra_dlls} $<TARGET_FILE_DIR:${TARGET_NAME}>)
-    install(FILES ${extra_dlls} DESTINATION .)
+  if(extra_libs)
+    add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy ${extra_libs} $<TARGET_FILE_DIR:${TARGET_NAME}>)
   endif()
 endif()
 
@@ -109,6 +108,7 @@ target_compile_definitions(${TARGET_NAME} PRIVATE IMPLEMENT_OPENVINO_EXTENSION_A
 # TODO: remove
 target_include_directories(${TARGET_NAME} PUBLIC ./include/)
 
+# Wheel packaging using skbuild
 if(DEFINED SKBUILD)
   # Installing the extension module to the root of the package
   if(LINUX)
@@ -120,6 +120,11 @@ if(DEFINED SKBUILD)
   elseif(WIN32 AND X86_64)
     install(TARGETS ${TARGET_NAME} RUNTIME DESTINATION .)
   else()
-    message(FATAL "Unsupported platform")
+    message(FATAL "Unsupported build platform")
   endif()
+
+  if(extra_libs)
+    install(FILES ${extra_libs} DESTINATION .)
+  endif()
+
 endif()
